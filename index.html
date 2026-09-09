@@ -30,14 +30,14 @@
 
   /* ---------- Header ---------- */
   header{
-    padding:52px 24px 36px;
+    padding:28px 24px 24px;
     text-align:center;
     background:
       radial-gradient(ellipse at top, rgba(201,162,93,0.18), transparent 60%),
       var(--cream);
     border-bottom:1px solid var(--line);
   }
-  .crest{margin:0 auto 18px; width:96px; height:96px; display:block;}
+  .crest{margin:0 auto 12px; width:96px; height:96px; display:block;}
   header h1{
     font-family:'Cormorant Garamond', serif;
     font-weight:700;
@@ -274,7 +274,7 @@
     background:var(--ink);
     color:var(--cream);
     border-radius:6px;
-    padding:26px 26px;
+    padding:10px 14px;
   }
   .summary h2{ color:var(--cream); }
   .summary-rows{ display:flex; flex-direction:column; gap:8px; margin:14px 0 16px; }
@@ -296,13 +296,23 @@
   .summary-category:first-child{ margin-top:0; }
   .summary-item{
     display:flex; justify-content:space-between; gap:12px;
+    align-items:flex-start;
     font-size:0.88rem;
     color:#CFC7B4;
-    padding:5px 0;
+    padding:6px 0;
     border-bottom:1px solid rgba(255,255,255,0.06);
   }
-  .summary-item .desc{ color:#CFC7B4; }
-  .summary-item b{ color:var(--cream); font-weight:500; white-space:nowrap; }
+  .summary-item .desc{
+    color:#CFC7B4;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .summary-item .desc .calc{
+    font-size:0.78rem;
+    color:#9C9482;
+  }
+  .summary-item b{ color:var(--cream); font-weight:500; white-space:nowrap; padding-top:1px; }
   .summary-category-total{
     display:flex; justify-content:space-between;
     font-size:0.95rem;
@@ -336,7 +346,7 @@
 
   @media (max-width:640px){
     main{ padding:28px 14px 0; }
-    header{ padding:40px 16px 28px; }
+    header{ padding:22px 16px 20px; }
     .job-card{ grid-template-columns:1fr; padding:18px 46px 16px 16px; }
     .scan-card{ grid-template-columns:1fr; }
     .extras-manual{ flex-direction:column; align-items:stretch; }
@@ -504,7 +514,7 @@
 </main>
 
 <footer>R.E. Prints · rates subject to change without notice</footer>
-
+  
 <script>
 // price[size][content][color]
 const PRINT_RATES = {
@@ -641,9 +651,10 @@ function recalc(){
     card.querySelector('.pLineTotal').textContent = peso(lineTotal);
     printTotal += lineTotal;
     if(pages > 0 && copies > 0){
-      const copyStr = copies > 1 ? ` × ${copies} copies` : '';
+      const copyStr = copies > 1 ? ` × ${copies} ${copies > 1 ? 'copies' : 'copy'}` : '';
       printItems.push({
-        desc: `${SIZE_LABEL[size]} · ${CONTENT_LABEL[content]} · ${COLOR_LABEL[color]} · ${pages} pg${copyStr}`,
+        desc: `${SIZE_LABEL[size]} · ${CONTENT_LABEL[content]} · ${COLOR_LABEL[color]}`,
+        calc: `${peso(rate)}/pg × ${pages} pg${copyStr}`,
         amount: lineTotal
       });
     }
@@ -664,7 +675,8 @@ function recalc(){
     if(pages > 0 && copies > 0){
       const copyStr = copies > 1 ? ` × ${copies} copies` : '';
       copyItems.push({
-        desc: `${SIZE_LABEL[size]} · ${COLOR_LABEL[color]} · ${pages} pg${copyStr}`,
+        desc: `${SIZE_LABEL[size]} · ${COLOR_LABEL[color]}`,
+        calc: `${peso(rate)}/pg × ${pages} pg${copyStr}`,
         amount: lineTotal
       });
     }
@@ -700,7 +712,8 @@ function recalc(){
     if(items.length === 0) return '';
     let block = `<div class="summary-category">${title}</div>`;
     items.forEach(item => {
-      block += `<div class="summary-item"><span class="desc">${item.desc}</span><b>${peso(item.amount)}</b></div>`;
+      const calcLine = item.calc ? `<span class="calc">${item.calc}</span>` : '';
+      block += `<div class="summary-item"><span class="desc">${item.desc}${calcLine}</span><b>${peso(item.amount)}</b></div>`;
     });
     block += `<div class="summary-category-total"><span>${title} total</span><b>${peso(total)}</b></div>`;
     return block;
@@ -711,14 +724,16 @@ function recalc(){
 
   if(scanPages > 0){
     html += renderCategory('Scanning', [{
-      desc: `${scanSizeLabel.split('(')[0].trim()} · ${scanPages} pg`,
+      desc: `${scanSizeLabel.split('(')[0].trim()}`,
+      calc: `${peso(scanRate)}/pg × ${scanPages} pg`,
       amount: scanTotal
     }], scanTotal);
   }
 
   if(extraPages > 0 && extraRateSum > 0){
     html += renderCategory('Extras & premiums', [{
-      desc: `${extraLabels.join(', ') || 'Custom premium'} · ${extraPages} pg`,
+      desc: `${extraLabels.join(', ') || 'Custom premium'}`,
+      calc: `${peso(extraRateSum)}/pg × ${extraPages} pg`,
       amount: extrasTotal
     }], extrasTotal);
   }
@@ -733,7 +748,6 @@ function recalc(){
 
 // initialize with one row each
 addPrintRow();
-addCopyRow();
 recalc();
 </script>
 
