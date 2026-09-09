@@ -464,7 +464,7 @@
   <section class="block">
     <div class="block-head" onclick="toggleSection('extrasBody','extrasToggle')">
       <div class="heading-text">
-        <h2>Extras &amp; premiums</h2>
+        <h2>Extras</h2>
         <p class="sub">Applied per page, added to your total. Check any that apply and set how many pages they cover.</p>
       </div>
       <button class="collapse-btn" id="extrasToggle" type="button" aria-label="Toggle extras">▾</button>
@@ -731,7 +731,7 @@ function recalc(){
   }
 
   if(extraPages > 0 && extraRateSum > 0){
-    html += renderCategory('Extras & premiums', [{
+    html += renderCategory('Extras', [{
       desc: `${extraLabels.join(', ') || 'Custom premium'}`,
       calc: `${peso(extraRateSum)}/pg × ${extraPages} pg`,
       amount: extrasTotal
